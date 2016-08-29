@@ -19,16 +19,16 @@ import { BlockComponent } from './block.component';
     <button (click)="self.addComponent('my-block')">MyBlock</button>
     <button (click)="self.addComponent('my-button')">MyButton</button>
   </div>
-  <div *componentOutlet="htmlSubject; context:self; selector:'my-dynamic-component'"></div>
+  <div *componentOutlet="html; context:self; selector:'my-dynamic-component'"></div>
   `,
 })
 export class AppComponent {
   self = this; // copy of context
   html = ``;
-  htmlSubject = new Subject<string>();
+  // htmlSubject = new Subject<string>();
 
   addComponent(tagName: string) {
-    // this.html += `<${tagName}>${Math.floor(Math.random() * 100)}</${tagName}>`;
-    this.htmlSubject.next(`<${tagName}>${Math.floor(Math.random() * 100)}</${tagName}>`);
+    this.html += `<${tagName}>${Math.floor(Math.random() * 100)}</${tagName}>`;
+    // this.htmlSubject.next(`<${tagName}>${Math.floor(Math.random() * 100)}</${tagName}>`);
   }
 }
