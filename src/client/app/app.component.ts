@@ -15,6 +15,7 @@ import { BlockComponent } from './block.component';
   <div>
     <button (click)="self.addComponent('p')">P</button>
     <button (click)="self.addComponent('textarea')">TextArea</button>
+    <button (click)="self.addComponent('textarea', true)">TextArea (Listener)</button>
     <button (click)="self.addComponent('my-block')">MyBlock</button>
     <button (click)="self.addComponent('my-button')">MyButton</button>
   </div>
@@ -26,8 +27,12 @@ export class AppComponent {
   html = ``;
   // htmlSubject = new Subject<string>();
 
-  addComponent(tagName: string) {
-    this.html += `<${tagName}>${Math.floor(Math.random() * 100)}</${tagName}>`;
+  addComponent(tagName: string, addChangeListener?: boolean) {
+    this.html += `<${tagName}${addChangeListener ? ' (change)="log($event.target.value)"' : ''}>${Math.floor(Math.random() * 100)}</${tagName}>`;
     // this.htmlSubject.next(`<${tagName}>${Math.floor(Math.random() * 100)}</${tagName}>`);
+  }
+
+  log(str: string) {
+    console.log(str);
   }
 }
