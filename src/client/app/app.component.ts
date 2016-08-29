@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
 import { BlockComponent } from './block.component';
 
@@ -13,19 +15,20 @@ import { BlockComponent } from './block.component';
   <h2>Dynamic</h2>
   <div>
     <button (click)="self.addComponent('p')">P</button>
-    <button (click)="self.addComponent('h3')">H3</button>
-    <button (click)="self.addComponent('h4')">H4</button>
     <button (click)="self.addComponent('textarea')">TextArea</button>
     <button (click)="self.addComponent('my-block')">MyBlock</button>
+    <button (click)="self.addComponent('my-button')">MyButton</button>
   </div>
-  <div *componentOutlet="html; context:self; selector:'my-dynamic-component'"></div>
+  <div *componentOutlet="htmlSubject; context:self; selector:'my-dynamic-component'"></div>
   `,
 })
 export class AppComponent {
   self = this; // copy of context
   html = ``;
+  htmlSubject = new Subject<string>();
 
   addComponent(tagName: string) {
-    this.html += `<${tagName}>${Math.floor(Math.random() * 100)}</${tagName}>`;
+    // this.html += `<${tagName}>${Math.floor(Math.random() * 100)}</${tagName}>`;
+    this.htmlSubject.next(`<${tagName}>${Math.floor(Math.random() * 100)}</${tagName}>`);
   }
 }
