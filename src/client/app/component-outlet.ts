@@ -13,7 +13,7 @@ import { Subject } from 'rxjs/Subject';
   selector: '[componentOutlet]',
 })
 export class ComponentOutlet {
-  @Input('componentOutlet') private template: string | Subject<string>;
+  @Input('componentOutlet') private template: Subject<string>;
   @Input('componentOutletSelector') private selector: string;
   @Input('componentOutletContext') private context: Object;
 
@@ -34,21 +34,12 @@ export class ComponentOutlet {
 
   ngOnChanges() {
     if (!this.template) return;
-    if (typeof this.template === 'string') {
-      this.compiler.compileComponentAsync(this._createDynamicComponent(this.template))
+    this.template.subscribe(template => {
+      this.compiler.compileComponentAsync(this._createDynamicComponent(template))
         .then(factory => {
           const injector = ReflectiveInjector.fromResolvedProviders([], this.vcRef.parentInjector);
-          this.vcRef.clear();
-          this.vcRef.createComponent(factory, 0, injector);
+          this.vcRef.createComponent(factory, undefined, injector);
         });
-    } else {
-      this.template.subscribe(template => {
-        this.compiler.compileComponentAsync(this._createDynamicComponent(template))
-          .then(factory => {
-            const injector = ReflectiveInjector.fromResolvedProviders([], this.vcRef.parentInjector);
-            this.vcRef.createComponent(factory, undefined, injector);
-          });
-      });
-    }
+    });
   }
 }
