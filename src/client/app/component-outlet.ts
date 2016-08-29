@@ -7,12 +7,13 @@ import {
   ReflectiveInjector,
   Compiler
 } from '@angular/core';
+import { Subject } from 'rxjs/Subject';
 
 @Directive({
   selector: '[componentOutlet]',
 })
 export class ComponentOutlet {
-  @Input('componentOutlet') private template: string;
+  @Input('componentOutlet') private template: string | Subject<string>;
   @Input('componentOutletSelector') private selector: string;
   @Input('componentOutletContext') private context: Object;
 
@@ -33,11 +34,21 @@ export class ComponentOutlet {
 
   ngOnChanges() {
     if (!this.template) return;
-    this.compiler.compileComponentAsync(this._createDynamicComponent(this.template))
-      .then(factory => {
-        const injector = ReflectiveInjector.fromResolvedProviders([], this.vcRef.parentInjector);
-        this.vcRef.clear();
-        this.vcRef.createComponent(factory, 0, injector);
+    if (typeof this.template === 'string') {
+      this.compiler.compileComponentAsync(this._createDynamicComponent(this.template))
+        .then(factory => {
+          const injector = ReflectiveInjector.fromResolvedProviders([], this.vcRef.parentInjector);
+          this.vcRef.clear();
+          this.vcRef.createComponent(factory, 0, injector);
+        });
+    } else {
+      this.template.subscribe(template => {
+        this.compiler.compileComponentAsync(this._createDynamicComponent(template))
+          .then(factory => {
+            const injector = ReflectiveInjector.fromResolvedProviders([], this.vcRef.parentInjector);
+            this.vcRef.createComponent(factory, undefined, injector);
+          });
       });
+    }
   }
 }
